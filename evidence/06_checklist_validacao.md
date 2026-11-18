@@ -15,6 +15,7 @@ Antes de publicar, conferi item por item:
 - [x] A reanálise confirmou a mitigação e apontou riscos residuais (`evidence/03`).
 - [x] O cenário Ubuntu mostrou o agente perguntando antes de sugerir comandos (`evidence/04`).
 - [x] Comparação com chat genérico documentada (`evidence/05`).
+- [x] Revisão da skill pelo próprio agente, com perguntas em vez de resposta pronta (`evidence/07`).
 - [x] Nenhum teste foi executado contra sistema de terceiros.
 - [x] Todos os arquivos citados no README existem e têm conteúdo.
 

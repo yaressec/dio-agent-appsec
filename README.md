@@ -92,6 +92,7 @@ python3 lab/app_fixed.py   # versão corrigida
 | [`evidence/04_cenario_ubuntu_contexto.txt`](evidence/04_cenario_ubuntu_contexto.txt) | Cenário de servidor Ubuntu: contexto antes de qualquer comando |
 | [`evidence/05_comparativo_chat_generico.txt`](evidence/05_comparativo_chat_generico.txt) | Chat genérico × agente especializado |
 | [`evidence/06_checklist_validacao.md`](evidence/06_checklist_validacao.md) | Checklist item a item |
+| [`evidence/07_revisao_da_skill.md`](evidence/07_revisao_da_skill.md) | O próprio agente revisa o SKILL.md com perguntas, sem resposta pronta |
 
 ### Prints
 
