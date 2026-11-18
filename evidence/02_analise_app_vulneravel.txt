@@ -1,0 +1,60 @@
+=== ANÁLISE DO app.py — SAÍDA NO FORMATO FIXO DA SKILL ===
+(Mesma ressalva: simulação conduzida seguindo o SKILL.md; ver evidence/01)
+
+## Contexto confirmado
+Código próprio, executado em laboratório local com SQLite em memória e
+credenciais fictícias. Nenhum sistema de terceiros envolvido.
+
+## Classificação
+- Vulnerabilidade: SQL Injection por concatenação de entrada na query (CWE-89).
+- Ameaça: qualquer pessoa capaz de enviar o campo de login, inclusive de forma automatizada.
+- Risco: leitura ou alteração não autorizada do banco e, se a conta consultada tiver privilégios, escalada no serviço.
+- MITRE ATT&CK: T1190 — Exploit Public-Facing Application. Aplicável se essa interface estivesse exposta; como é lab local, a técnica serve de referência de entender o vetor, não de acusar acesso inicial real.
+
+## Fluxo de dados
+parâmetro `username` / `password` -> nenhuma validação -> concatenação na string SQL -> `conn.execute(sql)` (sink)
+
+## Avaliação
+| Dimensão | Nível | Justificativa |
+|---|---|---|
+| Impacto | Alto | Confidencialidade e integridade: permite ler registros e, dependendo do driver, encadear instruções; disponibilidade pode ser afetada se houver destruição de dados |
+| Probabilidade | Alta no lab / Média em produção | No lab é trivial reproduzir; em produção exigiria acesso à interface de login, eventualmente mitigado por WAF ou rate limiting |
+| Severidade | Alta | Vetor simples, sem autenticação prévia e com impacto direto em dados |
+
+## Exploração (conceitual — somente laboratório)
+A query mistura código e dados. Quando o campo "password" contém aspas e uma
+expressão booleana, o interpretador SQL passa a tratar essa expressão como
+parte da condição, em vez de comparar uma senha literal. O resultado é que a
+condição `WHERE` pode se tornar sempre verdadeira e o login aceitar entradas
+inválidas. A execução real em `lab/app.py` confirmou: senha errada retornou
+`True` quando a entrada foi manipulada. Não há aqui payload pronto para
+reprodução fora do laboratório — o mecanismo é o que importa.
+
+## Correção
+Princípio: separar código de dados com **query parametrizada**. No lugar de
+montar a string, use placeholders e passe os valores como parâmetros:
+
+```python
+cursor = conn.execute(
+    "SELECT id FROM usuarios WHERE username = ?",
+    (username,),
+)
+```
+
+Defesa em profundidade:
+- armazenar senha como hash com salt (PBKDF2/bcrypt/Argon2), nunca texto puro;
+- validar tipo e tamanho da entrada antes da consulta;
+- usar conta de banco com menor privilégio;
+- limitar tentativas e registrar falhas de login;
+- não exibir detalhes de SQL/stack trace ao usuário.
+
+O arquivo `lab/app_fixed.py` aplica query parametrizada + hash PBKDF2.
+
+## Verificação
+Execute `python3 lab/app.py` e `python3 lab/app_fixed.py`, repita a entrada
+maliciosa no segundo e confirme que o retorno é `False`, enquanto o login
+legítimo continua `True`. Resultado registrado em `evidence/00_teste_comportamento.txt`.
+
+## Confirme o entendimento
+Consegue explicar, com as suas palavras, por que um placeholder (?) impede que
+a entrada vire código SQL?

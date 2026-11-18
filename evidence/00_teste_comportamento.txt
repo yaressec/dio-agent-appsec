@@ -1,0 +1,17 @@
+=== COMPORTAMENTO DOS APPS DO LABORATÓRIO (execução real) ===
+Comando: python3 /mnt/c/.../repo4/lab/test_lab_apps.py
+Nota: SQLite em memória, sem rede, sem dados reais.
+
+=== app.py (vulneravel) ===
+login correto: True
+login errado: False
+injetando na senha (somente lab local): True
+
+=== app_fixed.py (corrigido) ===
+login correto: True
+login errado: False
+mesma entrada maliciosa: False
+
+Conclusão: a consulta parametrizada eliminou a injeção observada,
+mantendo o login legítimo funcional. A entrada maliciosa usada foi
+"x' OR '1'='1" — demonstração restrita a este arquivo local.

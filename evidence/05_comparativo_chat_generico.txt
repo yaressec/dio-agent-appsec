@@ -1,0 +1,35 @@
+=== COMPARAÇÃO ILUSTRATIVA: CHAT GENÉRICO x AGENTE ESPECIALIZADO ===
+Finalidade: mostrar a diferença de comportamento que a skill propõe.
+O exemplo do chat genérico é ilustrativo — não foi executor neste laboratório.
+
+PERGUNTA (a mesma para os dois):
+"Tenho um app.py com login que concatena SQL. O que faço?"
+
+--- CHAT GENÉRICO (padrão típico, sem contexto) ---
+"Use sqlmap: sqlmap -u 'http://alvo/login' --forms --dbs. Depois troque a query
+por prepared statements."
+
+Problemas:
+- assume um alvo HTTP que não foi informado;
+- entrega ferramenta de ataque antes de saber se há autorização;
+- não avalia impacto, probabilidade ou severidade;
+- não pergunta quem pode acessar nem que dados estão em risco.
+
+--- DIO AGENT + vulnerability-analysis ---
+"Antes de analisar: esse app.py roda onde, e quem consegue acessá-lo?"
+
+Depois da resposta:
+- classifica CWE-89 e ATT&CK (quando aplicável);
+- mostra source -> sink;
+- preenche impacto/probabilidade/severidade no formato fixo;
+- explica o mecanismo antes da correção;
+- pede a reexecução para confirmar a mitigação.
+
+RESUMO DA DIFERENÇA
+| Aspecto | Chat genérico | Agente especializado |
+|---|---|---|
+| Contexto | assumido | perguntado primeiro |
+| Autorização | ignorada | verificada (Regra 0) |
+| Risco | não quantificado | impacto/probabilidade/severidade |
+| Correção | resposta pronta | princípio -> trecho -> verificação |
+| Aprendizado | baixo | o estudante raciocina junto |

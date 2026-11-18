@@ -1,0 +1,40 @@
+=== REANÁLISE APÓS A CORREÇÃO (app_fixed.py) ===
+Método: simulação seguindo o SKILL.md; ver evidence/01.
+
+VOCÊ:
+"Apliquei a correção. Faz uma nova varredura e me diz se o SQL Injection foi
+mitigado."
+
+AGENTE:
+"## Contexto confirmado
+Mesmo laboratório isolado de antes; agora avaliando `lab/app_fixed.py`.
+
+## Classificação
+- Vulnerabilidade original: SQL Injection (CWE-89) — **não observada** na nova versão.
+- Ameaça: continua existindo (qualquer cliente da interface de login).
+- Risco: reduzido. A injeção verificada deixou de funcionar.
+- MITRE ATT&CK: T1190 deixa de ser o vetor principal neste cenário; o foco passa a ser T1110 — Brute Force, se não houver limitação de tentativas.
+
+## Fluxo de dados
+parâmetro `username` -> validação implícita do driver -> parâmetro da query (?) -> `conn.execute(sql, params)` (sink seguro)
+
+## Avaliação
+| Dimensão | Nível | Justificativa |
+|---|---|---|
+| Impacto | Baixo para este vetor | A entrada maliciosa é tratada como dado literal |
+| Probabilidade | Baixa para este vetor | Não há concatenação; o teste local retornou `False` |
+| Severidade | Baixa (SQLi mitigado) | Vetor específico encerrado, com ressalvas abaixo |
+
+## Verificação executada
+- login legítimo (`aluno`/`senha123`): `True` ✅
+- senha errada: `False` ✅
+- entrada maliciosa usada no teste anterior: `False` ✅
+Evidência: `evidence/00_teste_comportamento.txt`.
+
+## Riscos residuais identificados
+1. **Sem rate limiting:** permite tentativas repetidas (T1110). Sugira atraso progressivo ou bloqueio temporário.
+2. **Enumeração por tempo:** o PBKDF2 só é calculado quando o usuário existe; a diferença de tempo pode revelar nomes válidos. Mitigação: calcular hash também para usuário inexistente com um salt fictício.
+3. **Erro genérico:** já implementado — boa prática mantida.
+
+## Confirme o entendimento
+Por que a correção removeu a injeção, mas não removeu sozinha o risco de força bruta?"
